@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historie návyků</title>
+  <style>
+    /* Globální stylování stránky */
+    body {
+      background-color: #f4f1ee; /* Nastavení barvy pozadí */
+      font-family: Arial, sans-serif; /* Font pro celý dokument */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center; /* Horizontální zarovnání na střed */
+      align-items: center; /* Vertikální zarovnání na střed */
+      height: 100vh; /* Výška celé obrazovky */
+    }
+
+    /* Stylování hlavního kontejneru */
+    .container {
+      text-align: center;
+      background-color: #ffffff; /* Bílá barva pozadí */
+      padding: 30px;
+      border-radius: 15px; /* Zaoblené rohy */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Jemný stín */
+    }
+
+    /* Stylování tlačítek */
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      background-color: #88a8a3;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    /* Nastavení gridu pro zobrazení 21 dnů */
+    #habitDays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr); /* 7 sloupců v jedné řadě */
+      gap: 5px;
+      margin-top: 20px;
+    }
+
+    /* Stylování každého políčka pro den */
+    .day {
+      width: 30px;
+      height: 30px;
+      border-radius: 4px;
+      background-color: #ccc; /* Výchozí šedá barva */
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Když je den splněn */
+    .completed {
+      background-color: #8bc34a !important; /* Zelená barva */
+    }
+
+    /* Když je den vynechán */
+    .missed {
+      background-color: #f44336 !important; /* Červená barva */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Nadpis formuláře -->
+    <h1>Historie návyků</h1>
+
+    <!-- Dropdown pro výběr návyku -->
+    <select id="habitSelect" onchange="renderDays(this.value)"></select>
+
+    <!-- Kontejner pro zobrazení jednotlivých dnů -->
+    <div id="habitDays"></div>
+
+    <!-- Tlačítka pro navigaci mezi stránkami -->
+    <button onclick="navigateTo('index.html')">Zpět na úvodní stránku</button>
+    <button onclick="navigateTo('add_habbit.html')">Přidat nový návyk</button> <!-- OPRAVENO -->
+  </div>
+
+  <script>
+    /**
+     * Přesměrování na jinou stránku
+     * @param {string} page - Název stránky, na kterou se má přejít.
+     */
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
+    /**
+     * Načte všechny uložené návyky z LocalStorage a naplní je do výběrového menu
+     */
+    function loadHabits() {
+      const select = document.getElementById('habitSelect');
+      const habits = JSON.parse(localStorage.getItem('habits')) || [];
+      select.innerHTML = ''; // Vyprázdní dropdown menu
+
+      habits.forEach(habit => {
+        const option = document.createElement('option');
+        option.value = habit;
+        option.textContent = habit;
+        select.appendChild(option); // Přidá novou možnost do výběru
+      });
+
+      // Pokud existují návyky, zobrazí dny prvního z nich
+      if (habits.length) renderDays(habits[0]);
+    }
+
+    /**
+     * Vykreslí 21 políček pro každý den návyku
+     * @param {string} habit - Název vybraného návyku
+     */
+    function renderDays(habit) {
+      const container = document.getElementById('habitDays');
+      const days = JSON.parse(localStorage.getItem(habit + '_days')) || new Array(21).fill(null);
+      container.innerHTML = ''; // Vyčistí předchozí obsah
+
+      // Vykreslí každé políčko (den) podle stavu
+      days.forEach((status, index) => {
+        const box = document.createElement('div');
+        box.classList.add('day');
+        box.textContent = index + 1; // Číslo dne
+
+        // Pokud je splněný
+        if (status === true) {
+          box.classList.add('completed');
+        }
+        // Pokud je vynechaný
+        else if (status === false) {
+          box.classList.add('missed');
+        }
+
+        /**
+         * Po kliknutí na den se změní jeho stav:
+         * - null → true (splněný)
+         * - true → false (vynechaný)
+         * - false → null (prázdný)
+         */
+        box.onclick = () => {
+          days[index] = days[index] === true ? false : days[index] === false ? null : true;
+          localStorage.setItem(habit + '_days', JSON.stringify(days));
+          renderDays(habit); // Obnoví zobrazení
+        };
+
+        container.appendChild(box); // Přidá den do zobrazení
+      });
+    }
+
+    // Po načtení stránky se naplní dropdown seznam
+    document.addEventListener('DOMContentLoaded', loadHabits);
+  </script>
+</body>
+</html>

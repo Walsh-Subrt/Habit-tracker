@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Habit Tracker</title>
+  <style>
+    /* Globální nastavení stylů pro stránku */
+    body {
+      background-color: #f4f1ee; /* Nastavení barvy pozadí */
+      font-family: Arial, sans-serif; /* Nastavení fontu pro text */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center; /* Horizontální zarovnání na střed */
+      align-items: center; /* Vertikální zarovnání na střed */
+      height: 100vh; /* Výška celé obrazovky */
+    }
+
+    /* Stylování hlavního kontejneru */
+    .container {
+      text-align: center;
+      background-color: #ffffff; /* Bílá barva pozadí */
+      padding: 30px;
+      border-radius: 15px; /* Zaoblené rohy */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Jemný stín */
+    }
+
+    /* Stylování tlačítek */
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      border: none;
+      background-color: #88a8a3;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    /* Odstranění výchozích odrážek v seznamu */
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    /* Stylování každého návyku (řádku v seznamu) */
+    li {
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Stylování tlačítka pro mazání */
+    .delete-btn {
+      background-color: #f44336; /* Červená barva tlačítka */
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    /* Efekt hover na tlačítku pro mazání */
+    .delete-btn:hover {
+      background-color: #e53935; /* Tmavší červená při hoveru */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Nadpis aplikace -->
+    <h1>Habit Tracker</h1>
+
+    <!-- Tlačítko pro přidání nového návyku -->
+    <button onclick="navigateTo('add_habbit.html')">Přidat nový návyk</button>
+
+    <!-- Tlačítko pro zobrazení seznamu návyků -->
+    <button onclick="navigateTo('habit_view.html')">Nabídka návyků</button>
+
+    <!-- Seznam všech návyků -->
+    <ul id="habit-list"></ul>
+  </div>
+
+  <script>
+    /**
+     * Funkce pro navigaci na jinou stránku
+     * @param {string} page - Název stránky, na kterou chceme přejít
+     */
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
+    /**
+     * Načítá seznam všech návyků z LocalStorage a vykresluje je do seznamu
+     */
+    function loadHabits() {
+      const habitList = document.getElementById('habit-list'); // Najde ul element v DOM
+      const habits = JSON.parse(localStorage.getItem('habits')) || []; // Načte všechny návyky nebo prázdné pole
+      
+      habitList.innerHTML = ''; // Vyčistí obsah seznamu
+      
+      habits.forEach(habit => {
+        // Vytvoří nový <li> element pro každý návyk
+        const li = document.createElement('li');
+        li.textContent = habit;
+
+        // Tlačítko na smazání návyku
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = "Smazat";
+        deleteButton.classList.add('delete-btn');
+        
+        // Při kliknutí se spustí funkce pro smazání
+        deleteButton.onclick = () => deleteHabit(habit);
+
+        // Přidá tlačítko do <li>
+        li.appendChild(deleteButton);
+
+        // Přidá <li> do <ul>
+        habitList.appendChild(li);
+      });
+    }
+
+    /**
+     * Funkce pro smazání návyku z LocalStorage i ze seznamu
+     * @param {string} habit - Název návyku, který se má smazat
+     */
+    function deleteHabit(habit) {
+      // Potvrzení akce od uživatele
+      if (confirm(`Opravdu chceš smazat návyk "${habit}"?`)) {
+        
+        // Načte seznam všech návyků a odstraní vybraný
+        let habits = JSON.parse(localStorage.getItem('habits')) || [];
+        habits = habits.filter(h => h !== habit);
+
+        // Aktualizuje LocalStorage
+        localStorage.setItem('habits', JSON.stringify(habits));
+        
+        // Odstraní i záznamy o splnění dní pro daný návyk
+        localStorage.removeItem(habit + '_days');
+
+        // Znovu načte seznam na stránce
+        loadHabits();
+      }
+    }
+
+    // Po načtení stránky se vykreslí seznam
+    document.addEventListener('DOMContentLoaded', loadHabits);
+  </script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Přidat návyk</title>
+  <style>
+    /* Globální nastavení stylů pro stránku */
+    body {
+      background-color: #f4f1ee; /* Nastavení barvy pozadí */
+      font-family: Arial, sans-serif; /* Nastavení fontu pro celý dokument */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center; /* Horizontální zarovnání na střed */
+      align-items: center; /* Vertikální zarovnání na střed */
+      height: 100vh; /* Výška na celou obrazovku */
+    }
+
+    /* Stylování hlavního kontejneru */
+    .container {
+      text-align: center; /* Zarovnání textu na střed */
+      background-color: #ffffff; /* Barva pozadí kontejneru */
+      padding: 30px; /* Vnitřní odsazení */
+      border-radius: 15px; /* Zaoblené rohy */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Jemný stín */
+    }
+
+    /* Stylování tlačítek */
+    button {
+      margin: 10px; /* Vnější odsazení mezi tlačítky */
+      padding: 10px 20px; /* Vnitřní odsazení */
+      border: none; /* Bez okrajů */
+      background-color: #88a8a3; /* Barva pozadí tlačítka */
+      color: white; /* Barva textu */
+      border-radius: 8px; /* Zaoblené rohy */
+      cursor: pointer; /* Změna kurzoru při hoveru */
+      font-size: 16px; /* Velikost písma */
+    }
+
+    /* Stylování vstupního pole */
+    input {
+      padding: 10px; /* Vnitřní odsazení */
+      margin-bottom: 10px; /* Spodní odsazení */
+      width: 60%; /* Šířka pole jako 60 % šířky kontejneru */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Nadpis formuláře -->
+    <h1>Přidat nový návyk</h1>
+
+    <!-- Vstupní pole pro zadání názvu návyku -->
+    <input type="text" id="newHabit" placeholder="Zadej název návyku">
+
+    <!-- Tlačítko pro přidání návyku -->
+    <button onclick="addHabit()">Přidat</button>
+
+    <!-- Tlačítko pro navigaci zpět na nabídku návyků -->
+    <button onclick="navigateTo('index.html')">Nabídka návyků</button>
+  </div>
+
+  <script>
+    /**
+     * Funkce pro navigaci na jinou stránku.
+     * @param {string} page - Název stránky, na kterou se má přejít.
+     */
+    function navigateTo(page) {
+      window.location.href = page; // Přesměruje uživatele na zadanou stránku.
+    }
+
+    /**
+     * Funkce pro přidání nového návyku do LocalStorage.
+     */
+    function addHabit() {
+      // Najde vstupní pole podle ID
+      const input = document.getElementById('newHabit');
+      // Vezme hodnotu z pole a odstraní bílé znaky z obou stran
+      const habit = input.value.trim();
+
+      // Pokud je pole prázdné, funkce skončí
+      if (!habit) return;
+
+      // Získá existující návyky z LocalStorage nebo vytvoří prázdné pole
+      const habits = JSON.parse(localStorage.getItem('habits')) || [];
+
+      // Přidá nový návyk pouze pokud již neexistuje
+      if (!habits.includes(habit)) {
+        habits.push(habit); // Přidá nový návyk do pole
+        localStorage.setItem('habits', JSON.stringify(habits)); // Uloží aktualizované pole do LocalStorage
+        
+        // Vytvoří v LocalStorage nový záznam s názvem návyku a prázdným 21denním polem
+        localStorage.setItem(habit + '_days', JSON.stringify(new Array(21).fill(null)));
+
+        // Vyčistí vstupní pole po přidání návyku
+        input.value = '';
+      }
+    }
+  </script>
+</body>
+</html>
